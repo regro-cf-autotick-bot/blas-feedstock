@@ -1,6 +1,6 @@
 {% set version = "3.11.0" %}
 # if build_num is reset to 0 (for new version), update increment for blas_minor below
-{% set build_num = 10 %}
+{% set build_num = 11 %}
 
 {% set version_major = version.split(".")[0] %}
 {% set version_minor = version.split(".")[1] %}
@@ -58,7 +58,7 @@ requirements:
     - {{ stdlib("c") }}
     - {{ compiler("c") }}
     - {{ compiler("fortran") }}
-    - cmake <4
+    - cmake
     - make      # [not win]
     - ninja     # [win]
     - create-forwarder-dll  # [win]
@@ -69,7 +69,7 @@ requirements:
     # only get installed by the build scripts, since they must be installed in a
     # different environment (otherwise there'd be a variant collision)! The build
     # script will link to those netlib libraries and set up the netlib test suite.
-    # For the different blas variants, build_pkg.{sh|bat} will then point those
+    # For the different blas variants, install_pkg.{sh|bat} will then point those
     # links to the respective libraries of the desired variant, and *then* run
     # the test suite (in test_blas.{sh|bat}) to see that everything works correctly.
     # Note: These libraries are built in the lapack-feedstock.
@@ -80,8 +80,8 @@ requirements:
 
 outputs:
   - name: libblas
-    script: build_pkg.sh     # [unix]
-    script: build_pkg.bat    # [win]
+    script: install_pkg.sh      # [unix]
+    script: install_pkg.bat     # [win]
     build:
       string: {{ build_num }}_h{{ PKG_HASH }}_{{ blas_impl }}
       run_exports:
@@ -140,8 +140,8 @@ outputs:
         - if not exist %LIBRARY_BIN%/libblas.dll exit 1           # [win]
 
   - name: libcblas
-    script: build_pkg.sh     # [unix]
-    script: build_pkg.bat    # [win]
+    script: install_pkg.sh      # [unix]
+    script: install_pkg.bat     # [win]
     build:
       string: {{ build_num }}_h{{ PKG_HASH }}_{{ blas_impl }}
       run_exports:
@@ -172,8 +172,8 @@ outputs:
         - if not exist %LIBRARY_BIN%/libcblas.dll exit 1           # [win]
 
   - name: liblapack
-    script: build_pkg.sh            # [unix]
-    script: build_pkg.bat           # [win]
+    script: install_pkg.sh      # [unix]
+    script: install_pkg.bat     # [win]
     build:
       skip: true  # [blas_impl == 'blis']
       string: {{ build_num }}_h{{ PKG_HASH }}_{{ blas_impl }}
@@ -208,8 +208,8 @@ outputs:
         - if not exist %LIBRARY_BIN%/liblapack.dll exit 1           # [win]
 
   - name: liblapacke
-    script: build_pkg.sh            # [unix]
-    script: build_pkg.bat           # [win]
+    script: install_pkg.sh      # [unix]
+    script: install_pkg.bat     # [win]
     build:
       skip: true  # [blas_impl == 'blis']
       string: {{ build_num }}_h{{ PKG_HASH }}_{{ blas_impl }}
@@ -300,7 +300,7 @@ outputs:
         - {{ stdlib("c") }}
         - {{ compiler("c") }}
         - {{ compiler("fortran") }}
-        - cmake <4
+        - cmake
         - ninja         # [win]
         # we end up calling a python script, see
         # https://github.com/Reference-LAPACK/lapack/blame/master/lapack_testing.py
@@ -312,10 +312,10 @@ outputs:
         - blas-devel {{ version }}   {{ build_num }}*_{{ blas_impl }}
     test:
       requires:
-        - numpy     # [not riscv64]
+        - numpy     # [not (win and arm64)]
       imports:
         # test that importing numpy works with LAPACK variant being built here
-        - numpy     # [not riscv64]
+        - numpy     # [not (win and arm64)]
       commands:
         - test -f $PREFIX/lib/liblapacke.so                          # [linux]
         - test -f $PREFIX/lib/liblapacke.so.{{ version_major }}      # [linux]

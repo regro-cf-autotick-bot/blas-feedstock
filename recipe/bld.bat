@@ -22,14 +22,14 @@ set "CFLAGS=-I%LIBRARY_PREFIX%\include %CFLAGS%"
 set "FFLAGS=-I%LIBRARY_PREFIX%\include %FFLAGS%"
 set "LDFLAGS=/LIBPATH:%LIBRARY_PREFIX%\lib %LDFLAGS%"
 
-set "PYTHON_EXEC=%BUILD_PREFIX%\python.exe"
+set "PYTHON_EXEC=%BUILD_PREFIX:\=/%/python.exe"
 
 %MINIFORGE_HOME%\Scripts\conda.exe create -p %NEW_ENV% --yes --quiet ^
     libblas=%PKG_VERSION%=*netlib ^
     libcblas=%PKG_VERSION%=*netlib ^
     liblapack=%PKG_VERSION%=*netlib ^
     liblapacke=%PKG_VERSION%=*netlib ^
-    flang_win-64=%fortran_compiler_version%
+    flang_%target_platform%=%fortran_compiler_version%
 if %ERRORLEVEL% neq 0 exit 1
 
 :: default activation for clang-windows uses clang.exe, not clang-cl.exe, see
@@ -57,8 +57,11 @@ if not "%lapack_impl_lib%"=="notapplicable" (
     if !ERRORLEVEL! neq 0 exit 1
 )
 
+:: Initialize the policy value in this configure and nested try_compile projects.
+set "CMAKE_POLICY_VERSION_MINIMUM=3.5"
+
 :: Link against the netlib libraries
-cmake -LAH -G Ninja .. ^
+cmake %CMAKE_ARGS% -LAH -G Ninja .. ^
     "-DBLAS_LIBRARIES=blas.lib;cblas.lib" ^
     "-DLAPACK_LIBRARIES=lapack.lib;lapacke.lib" ^
     -DBUILD_TESTING=yes ^
