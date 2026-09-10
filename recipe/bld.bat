@@ -29,7 +29,7 @@ set "PYTHON_EXEC=%BUILD_PREFIX%\python.exe"
     libcblas=%PKG_VERSION%=*netlib ^
     liblapack=%PKG_VERSION%=*netlib ^
     liblapacke=%PKG_VERSION%=*netlib ^
-    flang_win-64=%fortran_compiler_version%
+    flang_%target_platform%=%fortran_compiler_version%
 if %ERRORLEVEL% neq 0 exit 1
 
 :: default activation for clang-windows uses clang.exe, not clang-cl.exe, see
