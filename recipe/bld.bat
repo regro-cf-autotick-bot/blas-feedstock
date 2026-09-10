@@ -58,7 +58,7 @@ if not "%lapack_impl_lib%"=="notapplicable" (
 )
 
 :: Link against the netlib libraries
-cmake -LAH -G Ninja .. ^
+cmake %CMAKE_ARGS% -LAH -G Ninja .. ^
     "-DBLAS_LIBRARIES=blas.lib;cblas.lib" ^
     "-DLAPACK_LIBRARIES=lapack.lib;lapacke.lib" ^
     -DBUILD_TESTING=yes ^
