@@ -22,7 +22,7 @@ set "CFLAGS=-I%LIBRARY_PREFIX%\include %CFLAGS%"
 set "FFLAGS=-I%LIBRARY_PREFIX%\include %FFLAGS%"
 set "LDFLAGS=/LIBPATH:%LIBRARY_PREFIX%\lib %LDFLAGS%"
 
-set "PYTHON_EXEC=%BUILD_PREFIX%\python.exe"
+set "PYTHON_EXEC=%BUILD_PREFIX:\=/%/python.exe"
 
 %MINIFORGE_HOME%\Scripts\conda.exe create -p %NEW_ENV% --yes --quiet ^
     libblas=%PKG_VERSION%=*netlib ^
